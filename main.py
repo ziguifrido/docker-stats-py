@@ -1,5 +1,4 @@
 import docker
-import time
 from util import cli
 from util import convert
 from prettytable import PrettyTable
@@ -13,9 +12,7 @@ while True:
     table.field_names = ["ID", "Name", "CPU", "Memory"]
 
     if not containers:
-        cli.clear_screen()
-        print("No running containers found! Waiting...")
-        time.sleep(5)
+        cli.show_message("No running containers found! Waiting...")
         continue
 
     current_stats = {}
@@ -46,13 +43,11 @@ while True:
 
                 table.add_row([container_id, container_name, cpu_str, memory_str])
 
-        except docker.errors.APIError as e:
-            print(f"Error getting stats for container {container.id}: {e}")
+        except KeyError as e:
+            cli.show_messages([f"Error getting container stats: KeyError[{e}]", "Trying again..."])
             break
 
     previous_stats = current_stats
     cli.clear_screen()
     print(table)
     table.clear()
-
-    # time.sleep(5)
